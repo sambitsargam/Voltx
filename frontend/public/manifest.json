@@ -1,0 +1,24 @@
+{
+  "name": "Voltx - Renewable Energy Certificates Hub",
+  "short_name": "Voltx",
+  "description": "Trade, mint, and retire renewable energy certificates on Hedera blockchain",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#10B981",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/"
+}
