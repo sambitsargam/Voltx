@@ -1,370 +1,235 @@
-import { useState } from 'react';
-import { Factory, Plus, ExternalLink } from 'lucide-react';
-import { FACILITY_TYPES, getHashScanTxUrl } from '../utils/contract';
-import { toast } from 'react-toastify';
+import { useState, useEffect } from 'react'
+import { ethers } from 'ethers'
 
-export default function MintREC({ 
-  account, 
-  isValidConnection, 
-  isOwner, 
-  mintREC, 
-  registerFacility,
-  getFacility,
-  isLoading 
-}) {
-  const [activeTab, setActiveTab] = useState('mint');
+export default function MintREC({ account }) {
+  const [facilities, setFacilities] = useState([])
   const [mintForm, setMintForm] = useState({
     recipient: '',
     amount: '',
-    facilityId: ''
-  });
-  const [facilityForm, setFacilityForm] = useState({
     facilityId: '',
-    owner: '',
-    type: 'solar'
-  });
-  const [facilityInfo, setFacilityInfo] = useState(null);
-  const [txHash, setTxHash] = useState('');
+    generationDate: ''
+  })
+  const [isMinting, setIsMinting] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleMint = async (e) => {
-    e.preventDefault();
-    
-    if (!isValidConnection()) {
-      toast.error('Please connect your wallet and switch to Hedera Testnet');
-      return;
-    }
+  useEffect(() => {
+    loadFacilities()
+  }, [])
 
-    if (!isOwner) {
-      toast.error('Only the contract owner can mint RECs');
-      return;
-    }
-
+  const loadFacilities = async () => {
+    setLoading(true)
     try {
-      const hash = await mintREC(
+      if (typeof window.ethereum !== 'undefined') {
+        const provider = new ethers.BrowserProvider(window.ethereum)
+        const contract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          [
+            "function getFacilityCount() view returns (uint256)",
+            "function registeredFacilities(uint256) view returns (string)"
+          ],
+          provider
+        )
+
+        const count = await contract.getFacilityCount()
+        const facilityList = []
+        
+        for (let i = 0; i < count; i++) {
+          try {
+            const facilityId = await contract.registeredFacilities(i)
+            facilityList.push(facilityId)
+          } catch (error) {
+            console.error(`Error loading facility ${i}:`, error)
+          }
+        }
+        
+        setFacilities(facilityList)
+        if (facilityList.length > 0 && !mintForm.facilityId) {
+          setMintForm(prev => ({ ...prev, facilityId: facilityList[0] }))
+        }
+      }
+    } catch (error) {
+      console.error('Error loading facilities:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleMintREC = async (e) => {
+    e.preventDefault()
+    if (!mintForm.recipient || !mintForm.amount || !mintForm.facilityId) {
+      alert('Please fill in all fields')
+      return
+    }
+
+    setIsMinting(true)
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
+      const contract = new ethers.Contract(
+        process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+        [
+          "function mintREC(address to, uint256 amount, string facilityId, uint256 generationDate) external"
+        ],
+        signer
+      )
+
+      // Use provided date or default to yesterday
+      const generationTimestamp = mintForm.generationDate 
+        ? Math.floor(new Date(mintForm.generationDate).getTime() / 1000)
+        : Math.floor(Date.now() / 1000) - 86400
+
+      const tx = await contract.mintREC(
         mintForm.recipient,
-        parseInt(mintForm.amount),
-        mintForm.facilityId
-      );
-      
-      setTxHash(hash);
-      toast.success('RECs minted successfully!');
+        ethers.parseEther(mintForm.amount),
+        mintForm.facilityId,
+        generationTimestamp
+      )
+
+      await tx.wait()
       
       // Reset form
       setMintForm({
         recipient: '',
         amount: '',
-        facilityId: ''
-      });
-    } catch (error) {
-      console.error('Mint error:', error);
-      toast.error(error.message || 'Failed to mint RECs');
-    }
-  };
-
-  const handleRegisterFacility = async (e) => {
-    e.preventDefault();
-    
-    if (!isValidConnection()) {
-      toast.error('Please connect your wallet and switch to Hedera Testnet');
-      return;
-    }
-
-    if (!isOwner) {
-      toast.error('Only the contract owner can register facilities');
-      return;
-    }
-
-    try {
-      const hash = await registerFacility(
-        facilityForm.facilityId,
-        facilityForm.owner,
-        facilityForm.type
-      );
+        facilityId: facilities[0] || '',
+        generationDate: ''
+      })
       
-      setTxHash(hash);
-      toast.success('Facility registered successfully!');
-      
-      // Reset form
-      setFacilityForm({
-        facilityId: '',
-        owner: '',
-        type: 'solar'
-      });
+      alert(`Successfully minted ${mintForm.amount} VREC tokens to ${mintForm.recipient}!`)
     } catch (error) {
-      console.error('Register facility error:', error);
-      toast.error(error.message || 'Failed to register facility');
+      console.error('Error minting RECs:', error)
+      alert('Error minting RECs: ' + error.message)
+    } finally {
+      setIsMinting(false)
     }
-  };
+  }
 
-  const handleCheckFacility = async () => {
-    if (!facilityForm.facilityId) {
-      toast.error('Please enter a facility ID');
-      return;
-    }
+  const fillCurrentAccount = () => {
+    setMintForm(prev => ({ ...prev, recipient: account }))
+  }
 
-    try {
-      const facility = await getFacility(facilityForm.facilityId);
-      setFacilityInfo(facility);
-      toast.success('Facility found!');
-    } catch (error) {
-      console.error('Get facility error:', error);
-      setFacilityInfo(null);
-      toast.error('Facility not found');
-    }
-  };
-
-  if (!isValidConnection()) {
-    return (
-      <div className="bg-white rounded-lg card-shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-          <Factory className="h-5 w-5 mr-2" />
-          REC Management
-        </h2>
-        <div className="text-center py-8">
-          <p className="text-gray-600">
-            Please connect your wallet and switch to Hedera Testnet to manage RECs
-          </p>
-        </div>
-      </div>
-    );
+  const getCurrentDate = () => {
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    return yesterday.toISOString().split('T')[0]
   }
 
   return (
-    <div className="bg-white rounded-lg card-shadow p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-        <Factory className="h-5 w-5 mr-2" />
-        REC Management
-      </h2>
-
-      {/* Tab Navigation */}
-      <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-6">
-        <button
-          onClick={() => setActiveTab('mint')}
-          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-            activeTab === 'mint'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Mint RECs
-        </button>
-        <button
-          onClick={() => setActiveTab('facility')}
-          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-            activeTab === 'facility'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Manage Facilities
-        </button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">🪙 Mint RECs</h2>
+        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+          👑 Owner Only
+        </span>
       </div>
 
-      {/* Owner Check */}
-      {!isOwner && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-yellow-700">
-            Only the contract owner can mint RECs and register facilities. 
-            You can still view facility information.
-          </p>
-        </div>
-      )}
-
-      {/* Mint RECs Tab */}
-      {activeTab === 'mint' && (
-        <form onSubmit={handleMint} className="space-y-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <form onSubmit={handleMintREC} className="space-y-6">
+          {/* Recipient Address */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Recipient Address
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Recipient Address *
             </label>
-            <input
-              type="text"
-              placeholder="0x..."
-              value={mintForm.recipient}
-              onChange={(e) => setMintForm(prev => ({ ...prev, recipient: e.target.value }))}
-              className="input-field"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Amount (MWh)
-            </label>
-            <input
-              type="number"
-              placeholder="100"
-              min="1"
-              value={mintForm.amount}
-              onChange={(e) => setMintForm(prev => ({ ...prev, amount: e.target.value }))}
-              className="input-field"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Facility ID
-            </label>
-            <input
-              type="text"
-              placeholder="SOLAR-001"
-              value={mintForm.facilityId}
-              onChange={(e) => setMintForm(prev => ({ ...prev, facilityId: e.target.value }))}
-              className="input-field"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading || !isOwner}
-            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Minting...' : 'Mint RECs'}
-          </button>
-        </form>
-      )}
-
-      {/* Facility Management Tab */}
-      {activeTab === 'facility' && (
-        <div className="space-y-6">
-          {/* Register Facility Form */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Register New Facility</h3>
-            <form onSubmit={handleRegisterFacility} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Facility ID
-                </label>
-                <input
-                  type="text"
-                  placeholder="SOLAR-001"
-                  value={facilityForm.facilityId}
-                  onChange={(e) => setFacilityForm(prev => ({ ...prev, facilityId: e.target.value }))}
-                  className="input-field"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Facility Owner Address
-                </label>
-                <input
-                  type="text"
-                  placeholder="0x..."
-                  value={facilityForm.owner}
-                  onChange={(e) => setFacilityForm(prev => ({ ...prev, owner: e.target.value }))}
-                  className="input-field"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Facility Type
-                </label>
-                <select
-                  value={facilityForm.type}
-                  onChange={(e) => setFacilityForm(prev => ({ ...prev, type: e.target.value }))}
-                  className="input-field"
-                  required
-                >
-                  {FACILITY_TYPES.map(type => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading || !isOwner}
-                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Registering...' : 'Register Facility'}
-              </button>
-            </form>
-          </div>
-
-          {/* Check Facility */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Check Facility</h3>
             <div className="flex space-x-2">
               <input
                 type="text"
-                placeholder="Enter Facility ID"
-                value={facilityForm.facilityId}
-                onChange={(e) => setFacilityForm(prev => ({ ...prev, facilityId: e.target.value }))}
-                className="input-field flex-1"
+                placeholder="0x..."
+                value={mintForm.recipient}
+                onChange={(e) => setMintForm({...mintForm, recipient: e.target.value})}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                required
               />
               <button
                 type="button"
-                onClick={handleCheckFacility}
-                className="btn-secondary"
+                onClick={fillCurrentAccount}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
               >
-                Check
+                Use My Address
               </button>
             </div>
+          </div>
 
-            {facilityInfo && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">Facility Information</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-600">ID:</span>
-                    <span className="font-medium ml-2">{facilityInfo.facilityId}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Type:</span>
-                    <span className="font-medium ml-2 capitalize">{facilityInfo.facilityType}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Status:</span>
-                    <span className={`font-medium ml-2 ${facilityInfo.isActive ? 'text-green-600' : 'text-red-600'}`}>
-                      {facilityInfo.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-gray-600">Total Generated:</span>
-                    <span className="font-medium ml-2">{facilityInfo.totalGenerated} MWh</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-gray-600">Owner:</span>
-                    <span className="font-mono text-xs ml-2">{facilityInfo.owner}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-gray-600">Registered:</span>
-                    <span className="font-medium ml-2">{facilityInfo.registrationDate.toLocaleDateString()}</span>
-                  </div>
-                </div>
+          {/* Amount */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Amount (VREC) *
+            </label>
+            <input
+              type="number"
+              placeholder="e.g., 100"
+              value={mintForm.amount}
+              onChange={(e) => setMintForm({...mintForm, amount: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+
+          {/* Facility Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Facility *
+            </label>
+            {loading ? (
+              <div className="animate-pulse bg-gray-300 h-10 rounded-md"></div>
+            ) : facilities.length === 0 ? (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                <p className="text-yellow-700">No facilities registered. Please register a facility first.</p>
               </div>
+            ) : (
+              <select
+                value={mintForm.facilityId}
+                onChange={(e) => setMintForm({...mintForm, facilityId: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                required
+              >
+                {facilities.map(facilityId => (
+                  <option key={facilityId} value={facilityId}>{facilityId}</option>
+                ))}
+              </select>
             )}
           </div>
-        </div>
-      )}
 
-      {/* Transaction Hash Display */}
-      {txHash && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-800">Transaction Successful!</p>
-              <p className="text-xs text-green-600 font-mono">{txHash}</p>
-            </div>
-            <a
-              href={getHashScanTxUrl(txHash)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-green-600 hover:text-green-700 flex items-center text-sm"
-            >
-              View on HashScan <ExternalLink className="h-3 w-3 ml-1" />
-            </a>
+          {/* Generation Date */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Generation Date (optional)
+            </label>
+            <input
+              type="date"
+              value={mintForm.generationDate}
+              onChange={(e) => setMintForm({...mintForm, generationDate: e.target.value})}
+              max={getCurrentDate()}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty to use yesterday's date. Cannot be future date.
+            </p>
           </div>
-        </div>
-      )}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isMinting || facilities.length === 0}
+            className="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 transition-colors font-medium"
+          >
+            {isMinting ? '⏳ Minting RECs...' : '🪙 Mint RECs'}
+          </button>
+        </form>
+      </div>
+
+      {/* Info Card */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 className="font-semibold text-blue-800 mb-2">💡 Minting Information</h3>
+        <ul className="text-sm text-blue-700 space-y-1">
+          <li>• Only the contract owner can mint new REC tokens</li>
+          <li>• RECs must be associated with a registered facility</li>
+          <li>• Generation date cannot be in the future</li>
+          <li>• Each REC represents renewable energy generation</li>
+        </ul>
+      </div>
     </div>
-  );
+  )
 }

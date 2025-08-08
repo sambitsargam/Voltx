@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
-import { useAccount } from 'wagmi'
-import RainbowKitWallet from '../components/RainbowKitWallet'
+import WalletConnection from '../components/WalletConnection'
 import RECDashboard from '../components/RECDashboard'
 import MintREC from '../components/MintREC'
 import RECActions from '../components/RECActions'
@@ -10,7 +9,8 @@ import TransactionHistory from '../components/TransactionHistory'
 import ContractInfo from '../components/ContractInfo'
 
 export default function Home() {
-  const { address: account, isConnected } = useAccount()
+  const [isConnected, setIsConnected] = useState(false)
+  const [account, setAccount] = useState('')
   const [isOwner, setIsOwner] = useState(false)
   const [activeTab, setActiveTab] = useState('dashboard')
 
@@ -87,7 +87,12 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         {/* Wallet Connection */}
         <div className="mb-8">
-          <RainbowKitWallet />
+          <WalletConnection 
+            isConnected={isConnected}
+            setIsConnected={setIsConnected}
+            account={account}
+            setAccount={setAccount}
+          />
         </div>
 
         {isConnected && (

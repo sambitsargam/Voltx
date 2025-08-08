@@ -1,10 +1,11 @@
 import '../styles/globals.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Providers } from '../components/Providers';
 
 export default function App({ Component, pageProps }) {
   return (
-    <>
+    <Providers>
       <Component {...pageProps} />
       <ToastContainer
         position="top-right"
@@ -18,6 +19,6 @@ export default function App({ Component, pageProps }) {
         pauseOnHover
         theme="light"
       />
-    </>
+    </Providers>
   );
 }
