@@ -68,7 +68,7 @@ export default function MintREC({ account }) {
       const contract = new ethers.Contract(
         process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
         [
-          "function mintREC(address to, uint256 amount, string facilityId, uint256 generationDate) external"
+          "function mintFromFacility(address to, uint256 amount, string facilityId, string metadata) external"
         ],
         signer
       )
@@ -78,11 +78,11 @@ export default function MintREC({ account }) {
         ? Math.floor(new Date(mintForm.generationDate).getTime() / 1000)
         : Math.floor(Date.now() / 1000) - 86400
 
-      const tx = await contract.mintREC(
+      const tx = await contract.mintFromFacility(
         mintForm.recipient,
         ethers.parseEther(mintForm.amount),
         mintForm.facilityId,
-        generationTimestamp
+        `Generation date: ${mintForm.generationDate || 'Not specified'}`
       )
 
       await tx.wait()

@@ -71,9 +71,9 @@ export function useRECContract(account, isValidConnection) {
 
     try {
       setIsLoading(true);
-      const generationDate = Math.floor(Date.now() / 1000) - 86400; // Yesterday
+      const metadata = `Minted on ${new Date().toISOString()}`; // Generation metadata
       
-      const tx = await contract.mintREC(to, amountMWh, facilityId, generationDate);
+      const tx = await contract.mintFromFacility(to, amountMWh, facilityId, metadata);
       await tx.wait();
       
       // Reload data after successful mint
@@ -96,7 +96,7 @@ export function useRECContract(account, isValidConnection) {
       setIsLoading(true);
       const amountWei = ethers.parseEther(amount.toString());
       
-      const tx = await contract.retireREC(amountWei, reason);
+      const tx = await contract.retireTokens(amountWei, reason);
       await tx.wait();
       
       // Reload data after successful retirement
@@ -112,13 +112,13 @@ export function useRECContract(account, isValidConnection) {
   };
 
   // Register facility (owner only)
-  const registerFacility = async (facilityId, facilityOwner, facilityType) => {
+  const registerFacility = async (facilityId, name, location, energyType, capacity) => {
     if (!contract) throw new Error(ERROR_MESSAGES.WALLET_NOT_CONNECTED);
 
     try {
       setIsLoading(true);
       
-      const tx = await contract.registerFacility(facilityId, facilityOwner, facilityType);
+      const tx = await contract.registerFacility(facilityId, name, location, energyType, capacity);
       await tx.wait();
       
       return tx.hash;

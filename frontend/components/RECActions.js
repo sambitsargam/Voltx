@@ -79,12 +79,12 @@ export default function RECActions({ account }) {
       const contract = new ethers.Contract(
         process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
         [
-          "function retireREC(uint256 amount, string reason) external"
+          "function retireTokens(uint256 amount, string reason) external"
         ],
         signer
       )
 
-      const tx = await contract.retireREC(
+      const tx = await contract.retireTokens(
         ethers.parseEther(retireForm.amount),
         retireForm.reason
       )

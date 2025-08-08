@@ -9,10 +9,10 @@ export const REC_TOKEN_ABI = [
   "function allowance(address owner, address spender) view returns (uint256)",
   "function approve(address spender, uint256 amount) returns (bool)",
   "function transferFrom(address from, address to, uint256 amount) returns (bool)",
-  "function mintREC(address to, uint256 amountMWh, string facilityId, uint256 generationDate)",
-  "function retireREC(uint256 amount, string reason)",
-  "function registerFacility(string facilityId, address facilityOwner, string facilityType)",
-  "function getFacility(string facilityId) view returns (tuple(string facilityId, address owner, string facilityType, bool isActive, uint256 totalGenerated, uint256 registrationDate))",
+  "function mintFromFacility(address to, uint256 amount, string facilityId, string metadata)",
+  "function retireTokens(uint256 amount, string reason)",
+  "function registerFacility(string facilityId, string name, string location, string energyType, uint256 capacity)",
+  "function getFacility(string facilityId) view returns (tuple(string facilityId, string name, string location, string energyType, uint256 capacity, bool isActive, uint256 totalGenerated, uint256 registrationTime, address registeredBy))",
   "function getRetiredBalance(address account) view returns (uint256)",
   "function getFacilityCount() view returns (uint256)",
   "function totalRetired() view returns (uint256)",
@@ -20,9 +20,9 @@ export const REC_TOKEN_ABI = [
   "function paused() view returns (bool)",
   "event Transfer(address indexed from, address indexed to, uint256 value)",
   "event Approval(address indexed owner, address indexed spender, uint256 value)",
-  "event RECMinted(address indexed to, uint256 amount, string facilityId, uint256 generationDate)",
-  "event RECRetired(address indexed from, uint256 amount, string reason)",
-  "event FacilityRegistered(string facilityId, address indexed owner, string facilityType)"
+  "event TokensMinted(address indexed to, uint256 amount, string indexed facilityId, string metadata)",
+  "event TokensRetired(address indexed from, uint256 amount, string reason)",
+  "event FacilityRegistered(string indexed facilityId, string name, string location, string energyType, uint256 capacity, address registeredBy)"
 ];
 
 // Hedera Testnet Configuration
