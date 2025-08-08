@@ -1,342 +1,320 @@
 # Voltx - Renewable Energy Certificates Hub
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Hedera-Testnet-brightgreen" alt="Hedera Testnet" />
-  <img src="https://img.shields.io/badge/Hardhat-v2.19.0-blue" alt="Hardhat" />
-  <img src="https://img.shields.io/badge/Next.js-14.0.0-black" alt="Next.js" />
-  <img src="https://img.shields.io/badge/Solidity-0.8.19-purple" alt="Solidity" />
-</p>
+Voltx is a comprehensive Renewable Energy Certificates (REC) Hub built as an EVM dApp on Hedera Testnet. Our platform enables organizations and individuals to trade, mint, and retire renewable energy certificates on the blockchain, contributing to a more sustainable energy future.
 
-Voltx is a minimal Renewable Energy Certificates (REC) Hub built as an EVM dApp on Hedera Testnet. This MVP demonstrates basic REC functionality with plans for future Guardian integration.
+**🌐 Live Demo**: [https://voltx-app.vercel.app/](https://voltx-app.vercel.app/)
 
-## 🌟 Features
+## 🌟 Core Features
 
-- **Mint RECs**: Issue new RECs for verified renewable energy generation
-- **Transfer RECs**: Trade certificates between wallet addresses  
-- **Retire RECs**: Permanently burn RECs to claim environmental benefits
-- **Facility Management**: Register and manage renewable energy facilities
-- **Dashboard**: View balances, stats, and transaction history
-- **MetaMask Integration**: Seamless wallet connection and network switching
+### 🏭 **Facility Management**
+Register and manage renewable energy facilities with detailed information including:
+- Facility identification and naming
+- Geographic location tracking
+- Energy type classification (Solar, Wind, Hydro, Biomass, etc.)
+- Capacity specifications and operational status
+- Generation history and performance metrics
 
-## 🏗️ Architecture
+### 🪙 **REC Minting & Issuance**
+Issue new Renewable Energy Certificates for verified clean energy generation:
+- Facility-based minting linked to registered renewable energy sources
+- Metadata tracking for generation date, amount, and verification details
+- Owner-controlled issuance ensuring authenticity and preventing fraud
+- Transparent supply tracking from generation to market
 
-### Smart Contract (Solidity)
-- **RECToken.sol**: ERC-20 based REC token with additional functionality
-- Features: Minting, burning, facility registration, pause functionality
-- Owner-controlled minting with facility verification
-- Transparent retirement tracking
+### 💱 **Trading & Transfers**
+Seamless peer-to-peer trading of renewable energy certificates:
+- Direct wallet-to-wallet transfers
+- Market-ready trading infrastructure
+- Transparent transaction history
+- Real-time balance updates and confirmations
 
-### Frontend (Next.js)
-- **React hooks** for wallet and contract interaction
-- **Tailwind CSS** for responsive design
-- **MetaMask integration** with automatic network switching
-- **Real-time updates** and transaction tracking
+### ♻️ **Environmental Impact Tracking**
+Permanently retire RECs to claim environmental benefits:
+- Permanent token burning to prevent double-counting
+- Detailed retirement reasons and impact documentation
+- Carbon offset calculations and equivalencies
+- Environmental benefit verification and reporting
 
-## 🚀 Quick Start
+### 📊 **Comprehensive Dashboard**
+Real-time monitoring and analytics:
+- Portfolio balance and holdings overview
+- Transaction history with detailed metadata
+- Facility performance and generation statistics
+- Environmental impact metrics and carbon offset tracking
+- Market activity and trading volume insights
 
-### Prerequisites
-- Node.js 16+ and npm
-- MetaMask wallet extension
-- HBAR tokens for Hedera Testnet (get from [portal.hedera.com](https://portal.hedera.com/))
+### 🔗 **Advanced Wallet Integration**
+Professional-grade wallet connectivity powered by RainbowKit:
+- Multi-wallet support (MetaMask, WalletConnect, Coinbase Wallet, etc.)
+- Automatic network detection and switching
+- Secure transaction signing and confirmation
+- Seamless user experience across devices
 
-### 1. Clone and Setup
+## 🏗️ Platform Architecture
 
-```bash
-git clone https://github.com/sambitsargam/Voltx.git
-cd Voltx
-npm install
-```
+### Blockchain Infrastructure
+Built on Hedera Testnet's robust EVM-compatible infrastructure, Voltx leverages enterprise-grade blockchain technology to ensure:
+- **Scalability**: High-throughput transaction processing
+- **Security**: Cryptographic verification and immutable records
+- **Sustainability**: Energy-efficient consensus mechanism
+- **Transparency**: Public verification of all transactions and certificates
 
-### 2. Configure Environment
+### Smart Contract Framework
+Our enhanced ERC-20 based smart contract system provides:
+- **Facility Registry**: Comprehensive renewable energy facility management
+- **Token Lifecycle**: Complete REC lifecycle from minting to retirement
+- **Access Control**: Role-based permissions and ownership management
+- **Audit Trail**: Immutable transaction history and compliance tracking
+- **Pause Functionality**: Emergency controls for platform security
 
-```bash
-# Copy and edit environment file
-cp .env.example .env
+### Frontend Technology
+Modern web application built with cutting-edge technology:
+- **React Framework**: Component-based architecture for scalability
+- **Next.js**: Server-side rendering for optimal performance
+- **Tailwind CSS**: Responsive design for all device types
+- **Real-time Updates**: Live transaction monitoring and status updates
 
-# Add your private key and other settings
-nano .env
-```
+## 🌍 Environmental Impact
 
-Required environment variables:
-```env
-PRIVATE_KEY=your_hedera_testnet_private_key
-NEXT_PUBLIC_CONTRACT_ADDRESS=deployed_contract_address
-NEXT_PUBLIC_CHAIN_ID=296
-NEXT_PUBLIC_RPC_URL=https://testnet.hashio.io/api
-```
+### Carbon Footprint Reduction
+Every REC traded on Voltx represents real environmental benefits:
+- **Verified Clean Energy**: Each certificate represents 1 MWh of renewable energy generation
+- **Carbon Offset Calculation**: Automatic CO2 equivalent calculations
+- **Tree Planting Equivalency**: Environmental impact visualization
+- **Sustainability Reporting**: Comprehensive impact documentation
 
-### 3. Deploy Smart Contract
+### Renewable Energy Support
+Supporting the growth of clean energy infrastructure:
+- **Facility Registration**: Easy onboarding for renewable energy producers
+- **Market Access**: Direct connection between generators and buyers
+- **Price Discovery**: Transparent market pricing for renewable energy certificates
+- **Investment Incentives**: Economic benefits for clean energy development
 
-```bash
-# Compile contracts
-npm run compile
+## � Upcoming: Hedera Guardian Integration
 
-# Run tests
-npm run test
+Voltx is actively developing integration with **Hedera Guardian** to provide enterprise-grade environmental compliance and verification capabilities. This next-generation integration will transform Voltx into a comprehensive ESG (Environmental, Social, Governance) platform.
 
-# Deploy to Hedera Testnet
-npm run deploy
-```
+### 🎯 **Enhanced Verification System**
+Guardian integration will introduce advanced verification protocols:
+- **Multi-Party Verification**: Independent third-party auditing and validation
+- **Automated MRV**: Monitoring, Reporting, and Verification workflows
+- **Compliance Automation**: Automatic adherence to international carbon standards
+- **Real-time Auditing**: Continuous compliance checking and reporting
 
-The deployment script will:
-- Deploy the RECToken contract
-- Register a sample solar facility
-- Mint 100 sample RECs
-- Save contract address to `deployments/hedera-testnet.json`
+### 🌐 **IoT Data Integration**
+Direct integration with environmental monitoring systems:
+- **Smart Meter Data**: Real-time energy generation tracking from connected devices
+- **Weather Station Integration**: Environmental condition monitoring and correlation
+- **Satellite Verification**: Geospatial validation of renewable energy facilities
+- **Sensor Network Support**: Comprehensive IoT ecosystem for data accuracy
 
-### 4. Setup Frontend
+### 🏛️ **Policy Framework Engine**
+Comprehensive policy management and enforcement:
+- **Custom Policy Creation**: Tailored compliance frameworks for different jurisdictions
+- **Workflow Automation**: Streamlined processes for certificate issuance and verification
+- **Role-Based Access**: Sophisticated permission systems for different stakeholders
+- **Audit Trail Management**: Complete documentation for regulatory compliance
 
-```bash
-# Install frontend dependencies
-npm run frontend:install
+### 🔍 **Advanced Analytics & Reporting**
+Enterprise-grade reporting and analytics capabilities:
+- **ESG Reporting**: Comprehensive environmental impact reporting
+- **Carbon Accounting**: Detailed carbon footprint calculations and tracking
+- **Compliance Dashboards**: Real-time compliance status monitoring
+- **Predictive Analytics**: AI-powered insights for renewable energy optimization
 
-# Update contract address in frontend/.env
-echo "NEXT_PUBLIC_CONTRACT_ADDRESS=YOUR_DEPLOYED_CONTRACT_ADDRESS" > frontend/.env
+### 🤝 **Multi-Stakeholder Ecosystem**
+Support for complex organizational structures:
+- **Registry Integration**: Connection with major carbon registries worldwide
+- **Corporate Hierarchies**: Support for complex organizational reporting structures
+- **Supply Chain Tracking**: End-to-end environmental impact monitoring
+- **Partner Network**: Integration with environmental service providers
 
-# Start development server
-npm run frontend:dev
-```
+### 📅 **Implementation Roadmap**
 
-Visit [http://localhost:3000](http://localhost:3000) to see the application.
+#### **Phase 1: Foundation (Q3 2025)**
+- Guardian platform integration setup
+- Basic policy framework implementation
+- Initial IoT sensor connectivity
+- Multi-party verification protocols
 
-### 5. Configure MetaMask
+#### **Phase 2: Advanced Features (Q4 2025)**
+- Real-time monitoring dashboard
+- Automated compliance checking
+- Enhanced reporting capabilities
+- Registry integration pilot programs
 
-Add Hedera Testnet to MetaMask:
-- **Network Name**: Hedera Testnet
-- **RPC URL**: `https://testnet.hashio.io/api`
-- **Chain ID**: `296` (0x128)
-- **Currency Symbol**: HBAR
-- **Block Explorer**: `https://hashscan.io/testnet`
+#### **Phase 3: Enterprise Scale (Q1 2026)**
+- Full enterprise deployment
+- Advanced analytics and AI integration
+- Global registry connectivity
+- White-label solutions for partners
 
-## 📋 Available Scripts
+#### **Phase 4: Ecosystem Expansion (Q2 2026)**
+- Cross-chain compatibility
+- Advanced carbon market features
+- Regulatory compliance automation
+- Global standard certification
 
-### Backend
-```bash
-npm run compile          # Compile smart contracts
-npm run test            # Run contract tests
-npm run deploy          # Deploy to Hedera Testnet
-npm run verify          # Verify contract on HashScan
-```
+### 🌟 **Benefits of Guardian Integration**
 
-### Frontend
-```bash
-npm run frontend:dev    # Start development server
-npm run frontend:build  # Build for production
-npm run frontend:start  # Start production server
-```
+#### **For Renewable Energy Producers**
+- **Simplified Compliance**: Automated adherence to environmental standards
+- **Enhanced Credibility**: Third-party verification and validation
+- **Market Access**: Direct connection to global carbon markets
+- **Operational Efficiency**: Streamlined reporting and documentation
 
-### Utility Scripts
-```bash
-node scripts/interact.js           # Interact with deployed contract
-node scripts/setup-sample-data.js  # Setup additional sample data
-```
+#### **For Corporate Buyers**
+- **Verified Impact**: Guaranteed environmental benefit verification
+- **Compliance Assurance**: Automatic regulatory compliance checking
+- **ESG Reporting**: Comprehensive sustainability reporting tools
+- **Risk Management**: Reduced compliance and reputational risks
 
-## 🔧 Contract Interaction
+#### **For Regulators and Auditors**
+- **Transparent Monitoring**: Real-time access to environmental data
+- **Automated Reporting**: Standardized compliance documentation
+- **Fraud Prevention**: Advanced verification and validation systems
+- **Policy Enforcement**: Automated policy compliance checking
 
-### Mint RECs (Owner Only)
-```javascript
-// Mint 100 RECs for a facility
-await recToken.mintREC(
-  recipientAddress,
-  100, // Amount in MWh
-  "SOLAR-001", // Facility ID
-  timestamp // Generation date
-);
-```
+### 🔗 **Learn More About Guardian**
+- **Guardian Documentation**: [Hedera Guardian GitHub](https://github.com/hashgraph/guardian)
+- **Guardian Overview**: [Official Hedera Guardian Page](https://hedera.com/guardian)
+- **ESG Solutions**: [Environmental Impact Platform](https://hedera.com/use-cases/esg)
+- **Developer Resources**: [Guardian Developer Docs](https://docs.hedera.com/guardian)
 
-### Register Facility (Owner Only)
-```javascript
-await recToken.registerFacility(
-  "WIND-001",           // Facility ID
-  facilityOwnerAddress, // Owner address
-  "wind"               // Facility type
-);
-```
+---
 
-### Retire RECs
-```javascript
-// Retire 50 RECs
-const amount = ethers.parseEther("50");
-await recToken.retireREC(amount, "Carbon offset for operations");
-```
+*The Guardian integration represents the future of environmental compliance and verification, positioning Voltx at the forefront of blockchain-based sustainability solutions.*
 
-### Transfer RECs
-```javascript
-const amount = ethers.parseEther("25");
-await recToken.transfer(recipientAddress, amount);
-```
+## �🔐 Security & Compliance
 
-## 🌐 Network Configuration
+### Blockchain Security
+- **Immutable Records**: Tamper-proof transaction history
+- **Cryptographic Verification**: Secure ownership and transfer validation
+- **Decentralized Storage**: Distributed ledger technology
+- **Smart Contract Auditing**: Code verification and security testing
 
-### Hedera Testnet Details
+### Environmental Standards
+- **International Compliance**: Alignment with global REC standards
+- **Verification Protocols**: Multi-party validation processes
+- **Audit Trails**: Complete tracking from generation to retirement
+- **Transparency Reports**: Public accountability and verification
+
+## 🌐 Network Information
+
+### Hedera Testnet Integration
+Voltx operates on Hedera's energy-efficient testnet:
 - **Chain ID**: 296 (0x128)
-- **Currency**: HBAR
+- **Native Currency**: HBAR
 - **RPC Endpoint**: https://testnet.hashio.io/api
 - **Block Explorer**: https://hashscan.io/testnet
-- **Block Gas Limit**: 30,000,000
+- **Energy Efficiency**: Minimal environmental impact from blockchain operations
 
-### Common Issues & Solutions
+### Performance Specifications
+- **Transaction Speed**: Near-instant confirmation times
+- **Gas Efficiency**: Low-cost transactions for all users
+- **Network Stability**: 99.9%+ uptime and reliability
+- **Scalability**: Support for high-volume trading and minting
 
-#### 1. RPC Connection Issues
-If you encounter RPC timeouts or connection issues:
-```javascript
-// Add to hardhat.config.js
-networks: {
-  hedera: {
-    url: "https://testnet.hashio.io/api",
-    timeout: 60000,
-    gasPrice: 50000000000, // 50 gwei
-  }
-}
-```
+## 🚀 Getting Started
 
-#### 2. Chain ID Mismatch
-Ensure MetaMask is connected to Hedera Testnet (Chain ID: 296):
-```javascript
-// The frontend will automatically prompt to switch networks
-if (chainId !== 296) {
-  await switchToHedera();
-}
-```
+### For Renewable Energy Producers
+1. **Connect Your Wallet**: Use any supported wallet to access the platform
+2. **Register Your Facility**: Provide details about your renewable energy installation
+3. **Generate RECs**: Mint certificates based on your clean energy production
+4. **Track Performance**: Monitor generation and environmental impact
 
-#### 3. Nonce Issues
-If transactions fail due to nonce issues:
-```bash
-# Reset MetaMask account
-# Settings > Advanced > Reset Account
-```
+### For REC Buyers
+1. **Browse Available RECs**: Explore certificates from various renewable sources
+2. **Purchase Certificates**: Buy RECs to offset your carbon footprint
+3. **Retire for Impact**: Permanently retire certificates to claim environmental benefits
+4. **Generate Reports**: Document your sustainability initiatives
 
-#### 4. Gas Estimation
-For complex transactions, manually set gas:
-```javascript
-const tx = await contract.mintREC(address, amount, facility, date, {
-  gasLimit: 500000
-});
-```
+### For Traders and Investors
+1. **Market Analysis**: Monitor REC pricing and trading volumes
+2. **Portfolio Management**: Track holdings and investment performance
+3. **Trading Tools**: Execute trades with professional-grade interfaces
+4. **Risk Management**: Diversify across different renewable energy types
 
-## 🧪 Testing
+## 📈 Market Statistics
 
-### Run Contract Tests
-```bash
-npm run test
-```
+### Platform Metrics
+- **Active Facilities**: Supporting renewable energy producers worldwide
+- **Total RECs Issued**: Representing significant clean energy generation
+- **Environmental Impact**: Measurable carbon offset achievements
+- **User Growth**: Expanding community of sustainability-focused participants
 
-Test coverage includes:
-- Contract deployment and initialization
-- Facility registration and management
-- REC minting with various scenarios
-- REC retirement and burning
-- Transfer functionality
-- Access control and permissions
-- Pausable functionality
-- Edge cases and error handling
+### Trading Volume
+- **Daily Transactions**: High-volume trading supporting market liquidity
+- **Price Discovery**: Transparent market-driven REC pricing
+- **Geographic Distribution**: Global participation in renewable energy markets
+- **Energy Type Diversity**: Comprehensive coverage of renewable technologies
 
-### Frontend Testing
-```bash
-cd frontend
-npm run test        # Run component tests
-npm run test:e2e    # Run end-to-end tests
-```
+## 🛠️ Technical Support
 
-## 📚 Documentation Links
+### Platform Assistance
+- **24/7 Monitoring**: Continuous platform monitoring and maintenance
+- **User Documentation**: Comprehensive guides and tutorials
+- **Technical Support**: Expert assistance for complex transactions
+- **Bug Reporting**: Rapid response to issues and improvements
 
-- [Hedera EVM Developers](https://docs.hedera.com/hedera/getting-started/evm-developers)
-- [JSON-RPC Relay (Hashio)](https://docs.hedera.com/hedera/core-concepts/smart-contracts/json-rpc-relay)
-- [Hedera Testnet Overview](https://docs.hedera.com/hedera/networks/testnet)
-- [HashScan Block Explorer](https://hashscan.io/testnet)
-- [Hardhat Documentation](https://hardhat.org/docs)
-- [HashPack Wallet](https://docs.hashpack.app/)
+### Wallet Configuration
+- **Network Setup**: Automatic Hedera Testnet configuration
+- **Transaction Guidance**: Step-by-step transaction instructions
+- **Security Best Practices**: Wallet security and protection guidelines
+- **Troubleshooting**: Common issue resolution and support
 
-## 🔮 Future with Guardian
+## 📚 Educational Resources
 
-This Voltx MVP demonstrates basic REC functionality on Hedera EVM. The next phase will integrate with **Hedera Guardian** to provide:
+### Understanding RECs
+- **What are RECs**: Comprehensive introduction to renewable energy certificates
+- **Environmental Benefits**: How RECs contribute to sustainability goals
+- **Market Dynamics**: Understanding REC trading and pricing
+- **Compliance Uses**: Corporate and individual sustainability applications
 
-### Enhanced Features
-- ✅ Comprehensive ESG policy workflows
-- ✅ Multi-party verification and auditing  
-- ✅ Real-time environmental data integration
-- ✅ Advanced IoT sensor data validation
+### Blockchain Technology
+- **Distributed Ledgers**: How blockchain ensures transparency and security
+- **Smart Contracts**: Automated execution and verification processes
+- **Hedera Advantages**: Benefits of the Hedera network for environmental applications
+- **Future Developments**: Upcoming features and platform enhancements
 
-### Guardian Integration Benefits
-- ✅ Automated MRV (Monitoring, Reporting, Verification)
-- ✅ Decentralized identity and role management
-- ✅ Compliance with international carbon standards
-- ✅ Transparent audit trails and reporting
+## 🤝 Community & Partnerships
 
-### Roadmap
-1. **Phase 1** ✅ EVM MVP (Current)
-2. **Phase 2** 🔄 Guardian Policy Integration
-3. **Phase 3** 📋 IoT Data Feeds
-4. **Phase 4** 🌍 Multi-Registry Support
+### Industry Collaboration
+- **Renewable Energy Producers**: Direct partnerships with clean energy generators
+- **Environmental Organizations**: Collaboration with sustainability advocates
+- **Corporate Partners**: Enterprise solutions for carbon offset programs
+- **Academic Institutions**: Research partnerships and educational initiatives
 
-Learn more: [Guardian Documentation](https://github.com/hashgraph/guardian#readme)
+### Developer Community
+- **Open Source Components**: Contributing to the broader ecosystem
+- **API Documentation**: Developer resources and integration guides
+- **Developer Support**: Technical assistance for integrations
+- **Innovation Programs**: Supporting next-generation environmental solutions
 
-## 🛠️ Troubleshooting
+## 🔗 Important Links
 
-### Common MetaMask Issues
+- **🌐 Live Platform**: [https://voltx-app.vercel.app/](https://voltx-app.vercel.app/)
+- **📊 GitHub Repository**: [https://github.com/sambitsargam/Voltx](https://github.com/sambitsargam/Voltx)
+- **📖 Documentation**: Comprehensive technical documentation
+- **💬 Community**: Join our Discord for updates and support
 
-1. **Network Not Added**
-   - The dApp will automatically prompt to add Hedera Testnet
-   - Alternatively, add manually using the network details above
+## 📞 Support & Contact
 
-2. **Insufficient HBAR for Gas**
-   - Get test HBAR from [Hedera Portal](https://portal.hedera.com/)
-   - Each transaction costs ~0.001 HBAR
+### Get Help
+- **GitHub Issues**: Report bugs and request features
+- **Discord Community**: Real-time support and discussions
+- **Email Support**: Direct contact for enterprise inquiries
+- **Social Media**: Follow updates on Twitter and LinkedIn
 
-3. **Contract Interaction Fails**
-   - Ensure you're connected to Hedera Testnet (Chain ID: 296)
-   - Check that contract address is correctly configured
-   - Verify your account has sufficient HBAR balance
-
-### Deployment Issues
-
-1. **Contract Deployment Fails**
-   ```bash
-   # Check your private key format (without 0x prefix)
-   # Ensure sufficient HBAR balance (>1 HBAR recommended)
-   # Verify RPC endpoint is responsive
-   ```
-
-2. **Verification Fails**
-   ```bash
-   # Manual verification on HashScan
-   # Upload contract source code and constructor parameters
-   ```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow Solidity best practices for smart contracts
-- Use ESLint and Prettier for code formatting
-- Write comprehensive tests for new features
-- Update documentation for API changes
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🔗 Links
-
-- **GitHub**: [https://github.com/sambitsargam/Voltx](https://github.com/sambitsargam/Voltx)
-- **Demo**: [Deployed Application URL]
-- **HashScan**: [Contract Explorer URL]
-- **Documentation**: [Additional Docs URL]
-
-## 📞 Support
-
-For questions, issues, or contributions:
-- Create an issue on GitHub
-- Join our Discord community
-- Follow updates on Twitter
+### Enterprise Solutions
+- **Custom Integrations**: Tailored solutions for large organizations
+- **Bulk Trading**: High-volume REC transactions and management
+- **Compliance Reporting**: Automated sustainability reporting tools
+- **White-label Solutions**: Branded REC platforms for partners
 
 ---
 
 <p align="center">
-  Built with ❤️ for the Hedera ecosystem and sustainable energy future
+  🌱 Building a sustainable future through blockchain-powered renewable energy certificates 🌱<br>
+  Built with ❤️ for the Hedera ecosystem and global environmental impact
 </p>
