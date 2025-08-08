@@ -8,8 +8,11 @@
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.js --network hedera",
     "verify": "hardhat verify --network hedera",
+    "interact": "hardhat run scripts/interact.js --network hedera",
+    "setup-data": "hardhat run scripts/setup-sample-data.js --network hedera",
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
+    "frontend:start": "cd frontend && npm run start",
     "frontend:install": "cd frontend && npm install"
   },
   "keywords": ["renewable-energy", "certificates", "rec", "hedera", "evm", "blockchain"],

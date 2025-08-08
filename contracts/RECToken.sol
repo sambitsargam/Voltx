@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title RECToken
@@ -42,8 +42,8 @@ contract RECToken is ERC20, ERC20Burnable, Ownable, Pausable {
         string memory name,
         string memory symbol,
         address initialOwner
-    ) ERC20(name, symbol) Ownable() {
-        _transferOwnership(initialOwner);
+    ) ERC20(name, symbol) Ownable(initialOwner) {
+        // Constructor body is now empty since Ownable handles ownership transfer in v5
     }
     
     /**
@@ -143,7 +143,12 @@ contract RECToken is ERC20, ERC20Burnable, Ownable, Pausable {
         
         for (uint256 i = 0; i < recipients.length; i++) {
             if (recipients[i] != address(0) && amounts[i] > 0) {
-                mintREC(recipients[i], amounts[i], facilityId, generationDate);
+                uint256 tokenAmount = amounts[i] * DECIMALS_MULTIPLIER;
+                facilities[facilityId].totalGenerated += amounts[i];
+                
+                _mint(recipients[i], tokenAmount);
+                
+                emit RECMinted(recipients[i], tokenAmount, facilityId, generationDate);
             }
         }
     }
@@ -199,13 +204,13 @@ contract RECToken is ERC20, ERC20Burnable, Ownable, Pausable {
     }
     
     /**
-     * @dev Override transfer to add pause functionality
+     * @dev Override _update to add pause functionality (OpenZeppelin v5)
      */
-    function _beforeTokenTransfer(
+    function _update(
         address from,
         address to,
-        uint256 amount
+        uint256 value
     ) internal override whenNotPaused {
-        super._beforeTokenTransfer(from, to, amount);
+        super._update(from, to, value);
     }
 }
