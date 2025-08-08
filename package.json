@@ -1,0 +1,28 @@
+{
+  "name": "voltx",
+  "version": "1.0.0",
+  "description": "Voltx - Renewable Energy Certificates (REC) Hub on Hedera EVM",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js --network hedera",
+    "verify": "hardhat verify --network hedera",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:install": "cd frontend && npm install"
+  },
+  "keywords": ["renewable-energy", "certificates", "rec", "hedera", "evm", "blockchain"],
+  "author": "Voltx Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "hardhat": "^2.19.0",
+    "chai": "^4.3.7",
+    "ethers": "^6.8.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
