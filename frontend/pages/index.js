@@ -44,7 +44,7 @@ export default function Home() {
   const tabs = [
     { id: 'dashboard', name: 'Dashboard', icon: '📊' },
     { id: 'actions', name: 'REC Actions', icon: '⚡' },
-    { id: 'facilities', name: 'Facilities', icon: '🏭', ownerOnly: true },
+    { id: 'facilities', name: 'Registered Facilities', icon: '🏭' },
     { id: 'mint', name: 'Mint RECs', icon: '🪙', ownerOnly: true },
     { id: 'history', name: 'History', icon: '📜' },
     { id: 'contract', name: 'Contract Info', icon: '📋' }
@@ -132,7 +132,7 @@ export default function Home() {
                 </div>
               )}
 
-              {activeTab === 'facilities' && isOwner && (
+              {activeTab === 'facilities' && (
                 <div className="p-6">
                   <FacilityManagement account={account} />
                 </div>

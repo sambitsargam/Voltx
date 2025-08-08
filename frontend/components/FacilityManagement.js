@@ -14,6 +14,8 @@ export default function FacilityManagement({ account }) {
   const [facilities, setFacilities] = useState([])
   const [loading, setLoading] = useState(false)
   const [isRegistering, setIsRegistering] = useState(false)
+  const [isOwner, setIsOwner] = useState(false)
+  const [checkingOwner, setCheckingOwner] = useState(true)
   const [newFacility, setNewFacility] = useState({
     id: '',
     name: '',
@@ -21,6 +23,35 @@ export default function FacilityManagement({ account }) {
     energyType: 'Solar',
     capacity: ''
   })
+
+  useEffect(() => {
+    if (account) {
+      checkOwnership()
+      loadFacilities()
+    }
+  }, [account])
+
+  const checkOwnership = async () => {
+    setCheckingOwner(true)
+    try {
+      if (typeof window.ethereum !== 'undefined') {
+        const provider = new ethers.BrowserProvider(window.ethereum)
+        const contract = new ethers.Contract(
+          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          [
+            "function owner() view returns (address)"
+          ],
+          provider
+        )
+        const owner = await contract.owner()
+        setIsOwner(owner.toLowerCase() === account.toLowerCase())
+      }
+    } catch (error) {
+      console.error('Error checking ownership:', error)
+    } finally {
+      setCheckingOwner(false)
+    }
+  }
 
   useEffect(() => {
     if (account) {
@@ -116,16 +147,19 @@ export default function FacilityManagement({ account }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">🏭 Facility Management</h2>
-        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-          Owner Only
-        </span>
+        <h2 className="text-2xl font-bold text-gray-800">🏭 Registered Facilities</h2>
+        {isOwner && (
+          <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+            👑 Owner Access
+          </span>
+        )}
       </div>
 
-      {/* Register New Facility */}
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">Register New Facility</h3>
-        <form onSubmit={handleRegisterFacility} className="space-y-4">
+      {/* Register New Facility - Only for Owners */}
+      {isOwner && (
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Register New Facility</h3>
+          <form onSubmit={handleRegisterFacility} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -205,10 +239,18 @@ export default function FacilityManagement({ account }) {
           </button>
         </form>
       </div>
+      )}
 
       {/* Existing Facilities */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Registered Facilities</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Registered Facilities</h3>
+          {!isOwner && !checkingOwner && (
+            <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+              👀 View Only - Contact owner to register facilities
+            </div>
+          )}
+        </div>
         {loading ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
