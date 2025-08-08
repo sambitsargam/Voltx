@@ -18,7 +18,7 @@ module.exports = {
       chainId: 296, // 0x128
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gas: 30000000,
-      gasPrice: 50000000000, // 50 gwei
+      gasPrice: 340000000000, // 340 gwei - Hedera minimum
       timeout: 60000,
     },
     hardhat: {
