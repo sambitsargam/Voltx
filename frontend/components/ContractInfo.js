@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
+import { ENHANCED_CONTRACT_ABI, formatTokenAmount } from '../lib/contract'
 
 export default function ContractInfo() {
   const [contractData, setContractData] = useState({
@@ -8,8 +9,11 @@ export default function ContractInfo() {
     totalSupply: '0',
     owner: '',
     decimals: 18,
-    isPaused: false,
-    facilityCount: 0
+    facilityCount: 0,
+    transactionCount: 0,
+    totalRetired: '0',
+    tokenPrice: '0',
+    tradingEnabled: false
   })
   const [loading, setLoading] = useState(false)
 
@@ -24,36 +28,45 @@ export default function ContractInfo() {
         const provider = new ethers.BrowserProvider(window.ethereum)
         const contract = new ethers.Contract(
           process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          [
-            "function name() view returns (string)",
-            "function symbol() view returns (string)",
-            "function totalSupply() view returns (uint256)",
-            "function owner() view returns (address)",
-            "function decimals() view returns (uint8)",
-            "function paused() view returns (bool)",
-            "function getFacilityCount() view returns (uint256)"
-          ],
+          ENHANCED_CONTRACT_ABI,
           provider
         )
-
-        const [name, symbol, totalSupply, owner, decimals, isPaused, facilityCount] = await Promise.all([
+        // Get all contract data
+        const [
+          name, 
+          symbol, 
+          totalSupply, 
+          owner, 
+          decimals, 
+          facilityCount,
+          transactionCount,
+          totalRetired,
+          tokenPrice,
+          tradingEnabled
+        ] = await Promise.all([
           contract.name(),
           contract.symbol(),
           contract.totalSupply(),
           contract.owner(),
           contract.decimals(),
-          contract.paused(),
-          contract.getFacilityCount()
+          contract.getFacilityCount(),
+          contract.getTransactionCount(),
+          contract.getTotalRetired(),
+          contract.getTokenPrice(),
+          contract.isTradingEnabled()
         ])
 
         setContractData({
           name,
           symbol,
-          totalSupply: ethers.formatEther(totalSupply),
+          totalSupply: formatTokenAmount(totalSupply),
           owner,
           decimals: Number(decimals),
-          isPaused,
-          facilityCount: Number(facilityCount)
+          facilityCount: Number(facilityCount),
+          transactionCount: Number(transactionCount),
+          totalRetired: formatTokenAmount(totalRetired),
+          tokenPrice: ethers.formatEther(tokenPrice),
+          tradingEnabled
         })
       }
     } catch (error) {
@@ -78,7 +91,7 @@ export default function ContractInfo() {
       type: 'text'
     },
     {
-      label: 'Token Symbol',
+      label: 'Token Symbol', 
       value: contractData.symbol,
       type: 'text'
     },
@@ -93,18 +106,33 @@ export default function ContractInfo() {
       type: 'text'
     },
     {
+      label: 'Total Retired',
+      value: `${contractData.totalRetired} ${contractData.symbol}`,
+      type: 'text'
+    },
+    {
       label: 'Contract Owner',
       value: contractData.owner,
       type: 'address'
     },
     {
-      label: 'Contract Status',
-      value: contractData.isPaused ? 'Paused' : 'Active',
+      label: 'Token Price',
+      value: `${contractData.tokenPrice} ETH`,
+      type: 'text'
+    },
+    {
+      label: 'Trading Status',
+      value: contractData.tradingEnabled ? 'Enabled' : 'Disabled',
       type: 'status'
     },
     {
       label: 'Registered Facilities',
       value: contractData.facilityCount,
+      type: 'number'
+    },
+    {
+      label: 'Total Transactions',
+      value: contractData.transactionCount,
       type: 'number'
     }
   ]
@@ -185,7 +213,7 @@ export default function ContractInfo() {
                     </>
                   ) : info.type === 'status' ? (
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      info.value === 'Active' 
+                      info.value === 'Enabled' || info.value === 'Active'
                         ? 'bg-green-100 text-green-700' 
                         : 'bg-red-100 text-red-700'
                     }`}>
