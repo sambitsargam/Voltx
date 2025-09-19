@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react'
-import QRCode from 'qrcode.react'
+import { QRCodeCanvas } from 'qrcode.react'
 import {
   verifyCertificateId,
   getCertificateData,
@@ -233,7 +235,7 @@ export default function CertificateVerification({ account }) {
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">📱 Certificate QR Code</h3>
                 <div className="flex flex-col items-center space-y-4">
                   <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <QRCode
+                    <QRCodeCanvas
                       value={qrData}
                       size={200}
                       level="M"

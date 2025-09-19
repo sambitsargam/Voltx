@@ -1,3 +1,5 @@
+'use client';
+
 import { useAppKit, useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react'
 import { useBalance } from 'wagmi'
 import { hederaTestnet } from '../lib/wagmi'
