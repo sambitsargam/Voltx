@@ -39,84 +39,34 @@ export default function CertificateVerification({ account }) {
     setFacilityData(null)
 
     try {
-      if (typeof window.ethereum !== 'undefined') {
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        const contract = new ethers.Contract(
-          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          contractABI,
-          provider
-        )
-
-        // Get transaction count to validate certificate ID
-        const transactionCount = await contract.getTransactionCount()
-        const certId = parseInt(certificateId)
-
-        if (certId >= transactionCount || certId < 0) {
-          setError('Certificate ID not found')
-          return
-        }
-
-        // Get transaction data
-        const transaction = await contract.getTransaction(certId)
-
-        // Only show mint transactions as certificates
-        if (transaction.transactionType !== 'mint') {
-          setError('This transaction is not a valid REC certificate')
-          return
-        }
-
-        // Get facility data if facility ID exists
-        let facility = null
-        if (bytes32ToString(transaction.facilityId) !== '') {
-          try {
-            facility = await contract.getFacility(transaction.facilityId)
-          } catch (facilityError) {
-            console.log('Facility data not available:', facilityError)
-          }
-        }
-
-        // Check if tokens are still active (not retired)
-        const currentBalance = await contract.balanceOf(transaction.to)
-        const retiredBalance = await contract.retiredTokens(transaction.to)
-        const isActive = currentBalance > 0
-
-        const certData = {
-          id: certId,
-          from: transaction.from,
-          to: transaction.to,
-          amount: ethers.formatEther(transaction.amount),
-          transactionType: transaction.transactionType,
-          facilityId: bytes32ToString(transaction.facilityId),
-          timestamp: new Date(Number(transaction.timestamp) * 1000),
-          metadata: transaction.metadata,
-          isActive,
-          currentBalance: ethers.formatEther(currentBalance),
-          retiredBalance: ethers.formatEther(retiredBalance)
-        }
-
-        setCertificateData(certData)
-        setFacilityData(facility)
-
-        // Generate QR code data
-        const qrCodeData = {
-          certificateId: certId,
-          amount: certData.amount,
-          facilityId: certData.facilityId,
-          timestamp: certData.timestamp.toISOString(),
-          recipient: transaction.to,
-          contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          network: 'Hedera Testnet'
-        }
-
-        setQrData(JSON.stringify(qrCodeData))
-        setShowQR(true)
-
-      } else {
-        setError('Please connect your wallet to verify certificates')
+      // First verify the certificate ID exists
+      const verification = await verifyCertificateId(certificateId)
+      if (!verification.valid) {
+        setError(verification.error)
+        return
       }
+
+      // Get certificate data
+      const certData = await getCertificateData(certificateId)
+
+      // Validate certificate integrity
+      const validation = validateCertificateIntegrity(certData)
+      if (!validation.isValid) {
+        setError(`Certificate validation failed: ${validation.errors.join(', ')}`)
+        return
+      }
+
+      setCertificateData(certData)
+      setFacilityData(certData.facility)
+
+      // Generate QR code data
+      const qrCodeData = generateCertificateQRData(certData)
+      setQrData(JSON.stringify(qrCodeData))
+      setShowQR(true)
+
     } catch (error) {
       console.error('Error verifying certificate:', error)
-      setError('Failed to verify certificate. Please check the certificate ID and try again.')
+      setError(error.message || 'Failed to verify certificate. Please check the certificate ID and try again.')
     } finally {
       setLoading(false)
     }
@@ -128,11 +78,6 @@ export default function CertificateVerification({ account }) {
     } catch {
       return bytes32 // Return as-is if not bytes32
     }
-  }
-
-  const formatAddress = (address) => {
-    if (!address) return 'N/A'
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
   const resetVerification = () => {
