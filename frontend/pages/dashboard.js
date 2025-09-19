@@ -8,6 +8,7 @@ import RECActions from '../components/RECActions'
 import FacilityManagement from '../components/FacilityManagement'
 import TransactionHistory from '../components/TransactionHistory'
 import ContractInfo from '../components/ContractInfo'
+import CertificateVerification from '../components/CertificateVerification'
 
 export default function Home() {
   const { address: account, isConnected } = useAccount()
@@ -46,6 +47,7 @@ export default function Home() {
     { id: 'actions', name: 'REC Actions', icon: '⚡' },
     { id: 'facilities', name: 'Registered Facilities', icon: '🏭' },
     { id: 'mint', name: 'Mint RECs', icon: '🪙', ownerOnly: true },
+    { id: 'verification', name: 'Verify Certificates', icon: '🔍' },
     { id: 'history', name: 'History', icon: '📜' },
     { id: 'contract', name: 'Contract Info', icon: '📋' }
   ]
@@ -141,6 +143,12 @@ export default function Home() {
               {activeTab === 'mint' && isOwner && (
                 <div className="p-6">
                   <MintREC account={account} />
+                </div>
+              )}
+
+              {activeTab === 'verification' && (
+                <div className="p-6">
+                  <CertificateVerification account={account} />
                 </div>
               )}
 
