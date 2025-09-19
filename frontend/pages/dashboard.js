@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
-import RainbowKitWallet from '../components/RainbowKitWallet'
+import ReownWallet from '../components/ReownWallet'
 import RECDashboard from '../components/RECDashboard'
 import MintREC from '../components/MintREC'
 import RECActions from '../components/RECActions'
@@ -87,7 +87,7 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         {/* Wallet Connection */}
         <div className="mb-8">
-          <RainbowKitWallet />
+          <ReownWallet />
         </div>
 
         {isConnected && (

@@ -1,5 +1,6 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { mainnet, sepolia } from 'wagmi/chains';
+import { createAppKit } from '@reown/appkit'
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { mainnet, sepolia } from 'wagmi/chains'
 
 // Define Hedera Testnet
 const hederaTestnet = {
@@ -22,7 +23,7 @@ const hederaTestnet = {
     default: { name: 'HashScan', url: 'https://hashscan.io/testnet' },
   },
   testnet: true,
-};
+}
 
 // Define Hedera Mainnet for future use
 const hederaMainnet = {
@@ -45,15 +46,34 @@ const hederaMainnet = {
     default: { name: 'HashScan', url: 'https://hashscan.io/mainnet' },
   },
   testnet: false,
-};
+}
 
-export const config = getDefaultConfig({
-  appName: 'Voltx REC Hub',
-  projectId: 'YOUR_PROJECT_ID', // Get this from https://cloud.walletconnect.com
-  chains: [hederaTestnet, hederaMainnet],
-  ssr: true, // If your dApp uses server side rendering (SSR)
-  // Add additional options for better localhost support
-  multiInjectedProviderDiscovery: false,
-});
+// Get project ID from environment variables
+const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID || 'YOUR_REOWN_PROJECT_ID'
 
-export { hederaTestnet, hederaMainnet };
+// Create Wagmi adapter
+export const wagmiAdapter = new WagmiAdapter({
+  ssr: true,
+  projectId,
+  networks: [hederaTestnet, hederaMainnet],
+})
+
+// Create AppKit modal
+export const modal = createAppKit({
+  adapters: [wagmiAdapter],
+  networks: [hederaTestnet, hederaMainnet],
+  defaultNetwork: hederaTestnet,
+  projectId,
+  features: {
+    analytics: true,
+    email: false,
+    socials: [],
+    emailShowWallets: false,
+  },
+  themeMode: 'light',
+  themeVariables: {
+    '--w3m-accent': '#10b981', // Green-500
+  },
+})
+
+export { hederaTestnet, hederaMainnet }
