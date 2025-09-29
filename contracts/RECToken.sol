@@ -36,6 +36,13 @@ contract EnhancedRECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
         string metadata;
     }
     
+    struct Stake {
+        uint256 amount;
+        uint256 startTime;
+        uint256 lastClaimTime;
+        uint256 rewardRate; // Reward rate per second (in wei)
+    }
+    
     // ============ STATE VARIABLES ============
     
     mapping(uint256 => Facility) public facilities;
@@ -55,6 +62,12 @@ contract EnhancedRECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     // Price and trading
     uint256 public tokenPrice = 1e15; // 0.001 ETH per VREC (can be updated)
     bool public tradingEnabled = true;
+    
+    // Staking
+    mapping(address => Stake) public stakes;
+    mapping(address => uint256) public stakedBalances;
+    uint256 public totalStaked;
+    uint256 public rewardRatePerSecond = 3170979198; // ~10% APY in wei per second (1e18 / 365.25 / 24 / 3600 * 0.1)
     
     // ============ EVENTS ============
     
@@ -92,6 +105,10 @@ contract EnhancedRECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     
     event TokenPriceUpdated(uint256 oldPrice, uint256 newPrice);
     event TradingStatusChanged(bool enabled);
+    
+    event Staked(address indexed user, uint256 amount);
+    event Unstaked(address indexed user, uint256 amount);
+    event RewardsClaimed(address indexed user, uint256 amount);
     
     // ============ CONSTRUCTOR ============
     
@@ -390,6 +407,107 @@ contract EnhancedRECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
         );
         
         emit TokensMinted(msg.sender, tokenAmount, "", "Token purchase");
+    }
+    
+    // ============ STAKING SYSTEM ============
+    
+    event Staked(address indexed user, uint256 amount);
+    event Unstaked(address indexed user, uint256 amount);
+    event RewardsClaimed(address indexed user, uint256 amount);
+    
+    /**
+     * @dev Stake REC tokens to earn rewards
+     */
+    function stake(uint256 _amount) external nonReentrant {
+        require(_amount > 0, "Amount must be greater than 0");
+        require(balanceOf(msg.sender) >= _amount, "Insufficient balance");
+        
+        // Transfer tokens to contract
+        _transfer(msg.sender, address(this), _amount);
+        
+        // Update or create stake
+        if (stakes[msg.sender].amount == 0) {
+            stakes[msg.sender] = Stake({
+                amount: _amount,
+                startTime: block.timestamp,
+                lastClaimTime: block.timestamp,
+                rewardRate: rewardRatePerSecond
+            });
+        } else {
+            // Claim any pending rewards first
+            _claimRewards(msg.sender);
+            stakes[msg.sender].amount += _amount;
+        }
+        
+        stakedBalances[msg.sender] += _amount;
+        totalStaked += _amount;
+        
+        emit Staked(msg.sender, _amount);
+    }
+    
+    /**
+     * @dev Unstake REC tokens
+     */
+    function unstake(uint256 _amount) external nonReentrant {
+        require(_amount > 0, "Amount must be greater than 0");
+        require(stakedBalances[msg.sender] >= _amount, "Insufficient staked balance");
+        
+        // Claim rewards before unstaking
+        _claimRewards(msg.sender);
+        
+        // Update stake
+        stakes[msg.sender].amount -= _amount;
+        stakedBalances[msg.sender] -= _amount;
+        totalStaked -= _amount;
+        
+        // Transfer tokens back
+        _transfer(address(this), msg.sender, _amount);
+        
+        emit Unstaked(msg.sender, _amount);
+    }
+    
+    /**
+     * @dev Claim staking rewards
+     */
+    function claimRewards() external nonReentrant {
+        _claimRewards(msg.sender);
+    }
+    
+    /**
+     * @dev Internal function to claim rewards
+     */
+    function _claimRewards(address _user) internal {
+        uint256 rewards = calculateRewards(_user);
+        if (rewards > 0) {
+            stakes[_user].lastClaimTime = block.timestamp;
+            _mint(_user, rewards);
+            emit RewardsClaimed(_user, rewards);
+        }
+    }
+    
+    /**
+     * @dev Calculate pending rewards for a user
+     */
+    function calculateRewards(address _user) public view returns (uint256) {
+        if (stakes[_user].amount == 0) return 0;
+        
+        uint256 timeElapsed = block.timestamp - stakes[_user].lastClaimTime;
+        uint256 rewards = (stakes[_user].amount * stakes[_user].rewardRate * timeElapsed) / 1e18;
+        return rewards;
+    }
+    
+    /**
+     * @dev Get user's stake info
+     */
+    function getStakeInfo(address _user) external view returns (Stake memory) {
+        return stakes[_user];
+    }
+    
+    /**
+     * @dev Update reward rate (owner only)
+     */
+    function updateRewardRate(uint256 _newRate) external onlyOwner {
+        rewardRatePerSecond = _newRate;
     }
     
     // ============ VIEW FUNCTIONS ============
