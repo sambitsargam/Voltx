@@ -9,6 +9,7 @@ import FacilityManagement from '../components/FacilityManagement'
 import TransactionHistory from '../components/TransactionHistory'
 import ContractInfo from '../components/ContractInfo'
 import CertificateVerification from '../components/CertificateVerification'
+import MetaMaskWallet from '../components/MetaMaskWallet'
 
 export default function Home() {
   const { address: account, isConnected } = useAccount()
@@ -88,8 +89,12 @@ export default function Home() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Wallet Connection */}
-        <div className="mb-8">
+        <div className="mb-8 space-y-4">
           <ReownWallet />
+          <div className="text-center">
+            <span className="text-gray-500 text-sm">or</span>
+          </div>
+          <MetaMaskWallet />
         </div>
 
         {isConnected && (
